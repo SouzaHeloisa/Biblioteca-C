@@ -2,11 +2,15 @@
 
 Projeto acadêmico desenvolvido em linguagem C para gerenciamento de uma biblioteca utilizando listas encadeadas, alocação dinâmica de memória e persistência de dados em arquivos texto.
 
+---
+
 ## Sobre o Projeto
 
-Este sistema foi desenvolvido com o objetivo de aplicar os conceitos estudados na disciplina de Algoritmos e Estruturas de Dados I, implementando um sistema de biblioteca capaz de gerenciar livros e empréstimos de forma dinâmica.
+Este sistema foi desenvolvido como atividade da disciplina de **Algoritmos e Estruturas de Dados I**, com o objetivo de aplicar conceitos fundamentais da programação em C e de estruturas de dados.
 
-Os dados são armazenados em listas encadeadas durante a execução do programa e persistidos em arquivos texto, permitindo a recuperação das informações mesmo após o encerramento da aplicação.
+A aplicação permite realizar o gerenciamento de livros e empréstimos por meio de listas encadeadas simples, utilizando alocação dinâmica de memória e armazenamento permanente em arquivos texto.
+
+Os dados cadastrados permanecem disponíveis entre diferentes execuções do programa graças ao mecanismo de persistência implementado.
 
 ---
 
@@ -25,7 +29,7 @@ Os dados são armazenados em listas encadeadas durante a execução do programa 
 - Registro de empréstimos
 - Registro de devoluções
 - Listagem de empréstimos ativos
-- Atualização automática do estoque de exemplares
+- Atualização automática da quantidade de exemplares disponíveis
 
 ### Persistência de Dados
 
@@ -44,16 +48,14 @@ Biblioteca-C/
 ├── biblioteca.h
 ├── main.c
 ├── README.md
-├── livros.txt
-└── emprestimos.txt
 ```
 
 ### Descrição dos Arquivos
 
 | Arquivo | Descrição |
 |----------|----------|
-| biblioteca.h | Protótipos das funções e declarações do sistema |
-| biblioteca.c | Implementação das funcionalidades |
+| biblioteca.h | Protótipos das funções e declarações utilizadas pelo sistema |
+| biblioteca.c | Implementação das funcionalidades da biblioteca |
 | main.c | Menu principal e interação com o usuário |
 | livros.txt | Armazena os livros cadastrados |
 | emprestimos.txt | Armazena os empréstimos registrados |
@@ -63,9 +65,9 @@ Biblioteca-C/
 
 ## Estruturas Utilizadas
 
-### Livro
+### Estrutura Livro
 
-Cada livro possui:
+Cada livro armazena:
 
 - Código
 - Título
@@ -74,9 +76,9 @@ Cada livro possui:
 - Quantidade disponível
 - Ponteiro para o próximo livro
 
-### Empréstimo
+### Estrutura Empréstimo
 
-Cada empréstimo possui:
+Cada empréstimo armazena:
 
 - Nome do aluno
 - Matrícula
@@ -89,7 +91,7 @@ Cada empréstimo possui:
 
 ## Conceitos Aplicados
 
-Durante o desenvolvimento foram utilizados:
+Durante o desenvolvimento do projeto foram aplicados os seguintes conceitos:
 
 - Estruturas de Dados
 - Listas Encadeadas Simples
@@ -97,9 +99,9 @@ Durante o desenvolvimento foram utilizados:
 - Alocação Dinâmica de Memória
 - Manipulação de Arquivos
 - Manipulação de Strings
-- Modularização em C
+- Modularização em Linguagem C
 - Persistência de Dados
-- Gerenciamento de Memória (`malloc` e `free`)
+- Gerenciamento de Memória com `malloc()` e `free()`
 
 ---
 
@@ -113,25 +115,31 @@ Durante o desenvolvimento foram utilizados:
 
 ---
 
-## Compilação
+## Compilação (Windows)
 
-Com o GCC instalado:
+Com o GCC/MinGW instalado, execute no terminal:
 
 ```bash
 gcc main.c biblioteca.c -o biblioteca.exe
 ```
 
+Será gerado o arquivo executável:
+
+```text
+biblioteca.exe
+```
+
 ---
 
-## Execução
+## Execução (Windows)
 
-No Windows:
+Execute o programa pelo terminal:
 
 ```bash
 .\biblioteca.exe
 ```
 
-ou execute diretamente o arquivo:
+Ou execute diretamente o arquivo:
 
 ```text
 biblioteca.exe
@@ -154,6 +162,19 @@ biblioteca.exe
 
 ---
 
+## Objetivos de Aprendizagem
+
+Este projeto teve como objetivo praticar:
+
+- Implementação de listas encadeadas
+- Utilização de ponteiros
+- Alocação dinâmica de memória
+- Manipulação de arquivos texto
+- Modularização de programas em C
+- Desenvolvimento de sistemas utilizando estruturas de dados
+
+---
+
 ## Autores
 
 - Maria Heloísa Pessoa de Souza
@@ -165,16 +186,16 @@ biblioteca.exe
 
 **Disciplina:** Algoritmos e Estruturas de Dados I
 
-**Professora:** Prof.ª Dr.ª Rosana Cibely Batista Rego
+**Docente responsável:** Prof.ª Dr.ª Rosana Cibely Batista Rego
 
-**Instituição:** Ufersa - Campus Pau dos Ferros
+**Instituição:** Universidade Federal Rural do Semi-Árido (UFERSA) – Campus Pau dos Ferros
 
 **Semestre:** 2026.1
 
 ---
 
-## Status do Projeto
+## Licença
 
-✅ Concluído
+Este projeto foi desenvolvido exclusivamente para fins acadêmicos como atividade da disciplina de Algoritmos e Estruturas de Dados I.
 
-O sistema implementa o gerenciamento de livros e empréstimos utilizando listas encadeadas e persistência de dados em arquivos texto, atendendo aos requisitos propostos para a disciplina.
+A utilização do código para estudos e aprendizado é permitida, desde que os autores sejam devidamente citados.
