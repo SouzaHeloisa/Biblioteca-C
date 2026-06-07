@@ -1,20 +1,46 @@
 # Sistema de Biblioteca em C
 
-Projeto acadêmico desenvolvido em linguagem C para gerenciamento de uma biblioteca utilizando listas encadeadas, alocação dinâmica de memória e persistência de dados em arquivos texto.
+Projeto acadêmico desenvolvido em linguagem C para gerenciamento de uma biblioteca utilizando **Listas Encadeadas**, **Tipos Abstratos de Dados (TADs)**, **Alocação Dinâmica de Memória** e **Persistência de Dados em Arquivos Texto**.
+
+## Objetivo
+
+O objetivo deste projeto é aplicar os conceitos estudados na disciplina de **Algoritmos e Estruturas de Dados I**, desenvolvendo um sistema capaz de realizar o gerenciamento de livros e empréstimos de uma biblioteca.
+
+Durante o desenvolvimento foram utilizados conceitos fundamentais da linguagem C, incluindo:
+
+- Estruturas de Dados
+- Tipos Abstratos de Dados (TADs)
+- Listas Encadeadas Simples
+- Ponteiros
+- Alocação Dinâmica de Memória
+- Manipulação de Arquivos
+- Manipulação de Strings
+- Modularização de Código
+- Persistência de Dados
 
 ---
 
-## Sobre o Projeto
+## Sobre o Sistema
 
-Este sistema foi desenvolvido como atividade da disciplina de **Algoritmos e Estruturas de Dados I**, com o objetivo de aplicar conceitos fundamentais da programação em C e de estruturas de dados.
+O sistema permite o cadastro e gerenciamento de livros e empréstimos através de listas encadeadas alocadas dinamicamente.
 
-A aplicação permite realizar o gerenciamento de livros e empréstimos por meio de listas encadeadas simples, utilizando alocação dinâmica de memória e armazenamento permanente em arquivos texto.
+As informações são mantidas em memória durante a execução do programa e armazenadas em arquivos texto para garantir a persistência dos dados entre diferentes execuções.
 
-Os dados cadastrados permanecem disponíveis entre diferentes execuções do programa graças ao mecanismo de persistência implementado.
+O projeto foi organizado utilizando dois TADs independentes:
+
+### TAD Livro
+
+Responsável pelo gerenciamento do acervo da biblioteca.
+
+### TAD Empréstimo
+
+Responsável pelo gerenciamento dos empréstimos realizados pelos usuários.
+
+Essa separação torna o código mais organizado, modular e facilita futuras manutenções.
 
 ---
 
-## Funcionalidades
+## Funcionalidades Implementadas
 
 ### Gerenciamento de Livros
 
@@ -22,14 +48,14 @@ Os dados cadastrados permanecem disponíveis entre diferentes execuções do pro
 - Busca de livros por título
 - Listagem de livros cadastrados
 - Exclusão de livros
-- Controle automático da quantidade disponível
+- Controle da quantidade disponível
 
 ### Gerenciamento de Empréstimos
 
 - Registro de empréstimos
 - Registro de devoluções
 - Listagem de empréstimos ativos
-- Atualização automática da quantidade de exemplares disponíveis
+- Atualização automática da quantidade disponível dos livros
 
 ### Persistência de Dados
 
@@ -44,22 +70,36 @@ Os dados cadastrados permanecem disponíveis entre diferentes execuções do pro
 ```text
 Biblioteca-C/
 │
-├── biblioteca.c
-├── biblioteca.h
 ├── main.c
-├── README.md
+│
+├── livro.h
+├── livro.c
+│
+├── emprestimo.h
+├── emprestimo.c
+│
+├── livros.txt
+├── emprestimos.txt
+│
+├── .gitignore
+└── README.md
 ```
 
-### Descrição dos Arquivos
+---
+
+## Descrição dos Arquivos
 
 | Arquivo | Descrição |
 |----------|----------|
-| biblioteca.h | Protótipos das funções e declarações utilizadas pelo sistema |
-| biblioteca.c | Implementação das funcionalidades da biblioteca |
 | main.c | Menu principal e interação com o usuário |
-| livros.txt | Armazena os livros cadastrados |
-| emprestimos.txt | Armazena os empréstimos registrados |
+| livro.h | Declarações e definição da estrutura Livro |
+| livro.c | Implementação das funções relacionadas aos livros |
+| emprestimo.h | Declarações e definição da estrutura Empréstimo |
+| emprestimo.c | Implementação das funções relacionadas aos empréstimos |
+| livros.txt | Armazenamento dos livros cadastrados |
+| emprestimos.txt | Armazenamento dos empréstimos registrados |
 | README.md | Documentação do projeto |
+| .gitignore | Arquivos ignorados pelo Git |
 
 ---
 
@@ -76,6 +116,8 @@ Cada livro armazena:
 - Quantidade disponível
 - Ponteiro para o próximo livro
 
+A estrutura é utilizada para formar uma lista encadeada simples contendo todos os livros cadastrados.
+
 ### Estrutura Empréstimo
 
 Cada empréstimo armazena:
@@ -87,43 +129,84 @@ Cada empréstimo armazena:
 - Data de devolução
 - Ponteiro para o próximo empréstimo
 
+A estrutura é utilizada para formar uma lista encadeada simples contendo todos os empréstimos registrados.
+
 ---
 
-## Conceitos Aplicados
+## Organização em TADs
 
-Durante o desenvolvimento do projeto foram aplicados os seguintes conceitos:
+### TAD Livro
 
-- Estruturas de Dados
-- Listas Encadeadas Simples
-- Ponteiros
-- Alocação Dinâmica de Memória
-- Manipulação de Arquivos
-- Manipulação de Strings
-- Modularização em Linguagem C
-- Persistência de Dados
-- Gerenciamento de Memória com `malloc()` e `free()`
+Responsável pelas seguintes operações:
+
+- cadastrarLivro()
+- listarLivros()
+- buscarLivro()
+- excluirLivro()
+- salvarlivros()
+- carregarLivros()
+
+### TAD Empréstimo
+
+Responsável pelas seguintes operações:
+
+- emprestarLivro()
+- devolverLivro()
+- listarEmprestimos()
+- salvaremprestimos()
+- carregarEmprestimos()
+
+---
+
+## Persistência de Dados
+
+Os dados são armazenados nos arquivos:
+
+```text
+livros.txt
+emprestimos.txt
+```
+
+Sempre que um livro é cadastrado, excluído, emprestado ou devolvido, os arquivos são atualizados automaticamente.
+
+Ao iniciar o sistema, os dados são carregados novamente para a memória através das funções:
+
+- carregarLivros()
+- carregarEmprestimos()
+
+Dessa forma, as informações permanecem disponíveis mesmo após o encerramento do programa.
 
 ---
 
 ## Tecnologias Utilizadas
 
 - Linguagem C
-- GCC / MinGW
+- GCC (MinGW)
 - Visual Studio Code
 - Git
 - GitHub
 
 ---
 
-## Compilação (Windows)
+## Compilação
 
-Com o GCC/MinGW instalado, execute no terminal:
+Com o GCC instalado:
 
 ```bash
-gcc main.c biblioteca.c -o biblioteca.exe
+gcc main.c livro.c emprestimo.c -o biblioteca.exe
 ```
 
-Será gerado o arquivo executável:
+---
+
+## Execução
+
+No Windows:
+
+```bash
+.\biblioteca.exe
+```
+
+Ou execute diretamente:
 
 ```text
 biblioteca.exe
@@ -131,18 +214,30 @@ biblioteca.exe
 
 ---
 
-## Execução (Windows)
+## Clonando o Repositório
 
-Execute o programa pelo terminal:
+Abra o terminal e execute:
+
+```bash
+git clone https://github.com/SouzaHeloisa/Biblioteca-C.git
+```
+
+Acesse a pasta do projeto:
+
+```bash
+cd Biblioteca-C
+```
+
+Compile o sistema:
+
+```bash
+gcc main.c livro.c emprestimo.c -o biblioteca.exe
+```
+
+Execute:
 
 ```bash
 .\biblioteca.exe
-```
-
-Ou execute diretamente o arquivo:
-
-```text
-biblioteca.exe
 ```
 
 ---
@@ -162,19 +257,6 @@ biblioteca.exe
 
 ---
 
-## Objetivos de Aprendizagem
-
-Este projeto teve como objetivo praticar:
-
-- Implementação de listas encadeadas
-- Utilização de ponteiros
-- Alocação dinâmica de memória
-- Manipulação de arquivos texto
-- Modularização de programas em C
-- Desenvolvimento de sistemas utilizando estruturas de dados
-
----
-
 ## Autores
 
 - Maria Heloísa Pessoa de Souza
@@ -186,7 +268,7 @@ Este projeto teve como objetivo praticar:
 
 **Disciplina:** Algoritmos e Estruturas de Dados I
 
-**Docente responsável:** Prof.ª Dr.ª Rosana Cibely Batista Rego
+**Docente:** Prof.ª Dr.ª Rosana Cibely Batista Rego
 
 **Instituição:** Universidade Federal Rural do Semi-Árido (UFERSA) – Campus Pau dos Ferros
 
@@ -194,8 +276,8 @@ Este projeto teve como objetivo praticar:
 
 ---
 
-## Licença
+## Status do Projeto
 
-Este projeto foi desenvolvido exclusivamente para fins acadêmicos como atividade da disciplina de Algoritmos e Estruturas de Dados I.
+✅ Concluído
 
-A utilização do código para estudos e aprendizado é permitida, desde que os autores sejam devidamente citados.
+O sistema implementa o gerenciamento de livros e empréstimos utilizando listas encadeadas simples, TADs, alocação dinâmica de memória e persistência de dados em arquivos texto, atendendo aos requisitos propostos para a disciplina.

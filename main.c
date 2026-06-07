@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <windows.h>
-#include "biblioteca.h"
+#include "emprestimo.h"
+#include "livro.h"
 
 int main()
 {
