@@ -37,7 +37,7 @@ void listarLivros(Livro *livros){
         printf("\nNenhum livro cadastrado. \n");
         return;
     } // Verifica se a lista de livros está vazia e exibe uma mensagem caso esteja
-    Livro *atual = livros;
+    Livro *atual = livros; //ponteiro aux atual recebe o primeiro nó da lista 
     printf("\nLista de Livros:\n");
     while (atual != NULL)
     {
@@ -47,7 +47,7 @@ void listarLivros(Livro *livros){
         printf("Ano de Publicação: %d\n", atual->anopublicacao);
         printf("Quantidade Disponível: %d\n", atual->quantidade);
         printf("-------------------------\n");
-        atual = atual->prox;
+        atual = atual->prox; 
     } // Percorre a lista de livros e exibe as informações de cada livro até o final da lista (quando atual for NULL)
 }
 
