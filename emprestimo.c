@@ -1,104 +1,213 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "emprestimo.h"
 #include "livro.h"
-
+#include "validacao.h"
+#include "emprestimo.h"
 
 void emprestarLivro(Livro *livros, Emprestimo **emprestimos)
 {
     if (livros == NULL)
     {
-        printf("\nNenhum livro cadastrado. \n");
+        printf("\nNenhum livro cadastrado.\n");
         return;
-    } // Verifica se a lista de livros está vazia e exibe uma mensagem caso esteja
+    }
+
     char titulo[50];
-    printf("\nDigite o título do livro que deseja emprestar: ");
-    scanf(" %[^\n]", titulo);
+
+    lerString("Digite o título do livro que deseja emprestar: ", titulo, sizeof(titulo));
+
+    if (!validarDisponibilidade(livros, titulo))
+    {
+        printf("\nLivro não encontrado ou sem exemplares disponíveis.\n");
+        return;
+    }
+
     Livro *atual = livros;
+
     while (atual != NULL)
     {
         if (strcmp(atual->titulo, titulo) == 0)
-        { // Compara o título do livro atual com o título buscado usando strcmp. Se forem iguais, strcmp retorna 0.
-            if (atual->quantidade > 0)
+        {
+            Emprestimo *novoEmprestimo =
+                (Emprestimo *)malloc(sizeof(Emprestimo));
+
+            if (novoEmprestimo == NULL)
             {
-                atual->quantidade--; // Decrementa a quantidade disponível do livro
-                Emprestimo *novoEmprestimo = (Emprestimo *)malloc(sizeof(Emprestimo));
-                if (novoEmprestimo == NULL)
+                printf("\nErro ao alocar memória para o empréstimo.\n");
+                return;
+            }
+
+            do
+            {
+                lerString(
+                    "Digite o nome do aluno: ",
+                    novoEmprestimo->nomealuno,
+                    sizeof(novoEmprestimo->nomealuno));
+
+                if (!validarNome(novoEmprestimo->nomealuno))
                 {
-                    printf("\nErro ao alocar memória para o novo empréstimo.\n");
-                    return;
+                    printf("Nome inválido.\n");
                 }
-                printf("\nDigite o nome do aluno: ");
-                scanf(" %[^\n]", novoEmprestimo->nomealuno);
-                printf("Digite a matrícula do aluno: ");
-                scanf("%d", &novoEmprestimo->matricula);
-                strcpy(novoEmprestimo->titulolivro, atual->titulo); // Copia o título do livro para o empréstimo
-                printf("Digite a data de empréstimo (dd/mm/aaaa): ");
-                scanf(" %[^\n]", novoEmprestimo->dataemprestimo);
-                printf("Digite a data de entrega (dd/mm/aaaa): ");
-                scanf(" %[^\n]", novoEmprestimo->dataentrega);
-                novoEmprestimo->prox = *emprestimos; // O novo empréstimo aponta para o início da lista de empréstimos
-                *emprestimos = novoEmprestimo;       // O início da lista de empréstimos agora é o novo empréstimo
-                salvarlivros(livros);                // Salva os livros no arquivo após o empréstimo
-                salvaremprestimos(*emprestimos);     // Salva os empréstimos no arquivo após o cadastro do novo empréstimo
-                printf("\nLivro emprestado com sucesso.\n");
-            }
-            else
+
+            } while (!validarNome(novoEmprestimo->nomealuno));
+            do
             {
-                printf("\nDesculpe, não há exemplares disponíveis deste livro.\n");
+                novoEmprestimo->matricula =
+                    lerInteiro("Digite a matrícula do aluno: ");
+
+                if (!validarMatricula(novoEmprestimo->matricula))
+                {
+                    printf("Matrícula inválida.\n");
+                }
+
+            } while (!validarMatricula(novoEmprestimo->matricula));
+
+            // Validação nova — vem logo após o bloco da matrícula
+            if (!matriculaCompativel(*emprestimos, novoEmprestimo->matricula, novoEmprestimo->nomealuno))
+            {
+                printf("\nEsta matrícula já está cadastrada para outro aluno.\n");
+                free(novoEmprestimo);
+                return;
             }
-            return; // Encerra a função após encontrar o livro
+
+            strcpy(novoEmprestimo->titulolivro,atual->titulo);
+
+            if (emprestimoJaExiste(*emprestimos,novoEmprestimo->matricula,novoEmprestimo->titulolivro))
+            {
+                printf(
+                    "\nEste aluno já possui este livro emprestado.\n");
+
+                free(novoEmprestimo);
+                return;
+            }
+
+            do
+            {
+                lerString(
+                    "Digite a data de empréstimo (dd/mm/aaaa): ",
+                    novoEmprestimo->dataemprestimo,
+                    sizeof(novoEmprestimo->dataemprestimo));
+
+                if (!validarDataEmprestimo(
+                        novoEmprestimo->dataemprestimo))
+                {
+                    printf(
+                        "Data de empréstimo inválida.\n");
+                }
+
+            } while (!validarDataEmprestimo(
+                novoEmprestimo->dataemprestimo));
+
+            do
+            {
+                lerString(
+                    "Digite a data de entrega (dd/mm/aaaa): ",
+                    novoEmprestimo->dataentrega,
+                    sizeof(novoEmprestimo->dataentrega));
+
+                if (!validarDataEntrega(
+                        novoEmprestimo->dataemprestimo,
+                        novoEmprestimo->dataentrega))
+                {
+                    printf(
+                        "A data de entrega não pode ser anterior à data de empréstimo.\n");
+                }
+
+            } while (!validarDataEntrega(
+                novoEmprestimo->dataemprestimo,
+                novoEmprestimo->dataentrega));
+
+            atual->quantidade--;
+
+            novoEmprestimo->prox = *emprestimos;
+            *emprestimos = novoEmprestimo;
+
+            salvarlivros(livros);
+            salvaremprestimos(*emprestimos);
+
+            printf("\nLivro emprestado com sucesso.\n");
+            return;
         }
-        atual = atual->prox; // Move para o próximo livro na lista
+
+        atual = atual->prox;
     }
-    printf("\nLivro não encontrado.\n"); // Se o loop terminar sem encontrar o livro, exibe uma mensagem indicando que o livro não foi encontrado
+
+    printf("\nLivro não encontrado.\n");
 }
 
 void devolverLivro(Livro *livros, Emprestimo **emprestimos)
 {
     if (*emprestimos == NULL)
     {
-        printf("\nNenhum empréstimo registrado. \n");
+        printf("\nNenhum empréstimo registrado.\n");
         return;
-    } // Verifica se a lista de empréstimos está vazia e exibe uma mensagem caso esteja
+    }
+
     char titulo[50];
-    printf("\nDigite o título do livro que deseja devolver: ");
-    scanf(" %[^\n]", titulo);
+    int matricula;
+
+    lerString(
+        "Digite o título do livro: ",
+        titulo,
+        sizeof(titulo));
+
+    do
+    {
+        matricula = lerInteiro(
+            "Digite a matrícula do aluno: ");
+
+        if (!validarMatricula(matricula))
+        {
+            printf("Matrícula inválida.\n");
+        }
+
+    } while (!validarMatricula(matricula));
+
     Emprestimo *atual = *emprestimos;
     Emprestimo *anterior = NULL;
+
     while (atual != NULL)
     {
-        if (strcmp(atual->titulolivro, titulo) == 0)
-        { // Compara o título do livro emprestado com o título do livro a ser devolvido usando strcmp. Se forem iguais, strcmp retorna 0.
+        if (strcmp(atual->titulolivro, titulo) == 0 &&
+            atual->matricula == matricula)
+        {
             if (anterior == NULL)
             {
-                *emprestimos = atual->prox; // Se o empréstimo a ser removido for o primeiro da lista, atualiza o início da lista para o próximo empréstimo
+                *emprestimos = atual->prox;
             }
             else
             {
-                anterior->prox = atual->prox; // Caso contrário, ajusta o ponteiro do empréstimo anterior para pular o empréstimo a ser removido
+                anterior->prox = atual->prox;
             }
-            free(atual); // Libera a memória alocada para o empréstimo removido
+
             Livro *livroAtual = livros;
+
             while (livroAtual != NULL)
             {
                 if (strcmp(livroAtual->titulo, titulo) == 0)
-                {                             // Compara o título do livro atual com o título do livro a ser devolvido usando strcmp. Se forem iguais, strcmp retorna 0.
-                    livroAtual->quantidade++; // Incrementa a quantidade disponível do livro
-                    break;                    // Encerra o loop após encontrar o livro
+                {
+                    livroAtual->quantidade++;
+                    break;
                 }
-                livroAtual = livroAtual->prox; // Move para o próximo livro na lista
+
+                livroAtual = livroAtual->prox;
             }
-            salvarlivros(livros);            // Salva os livros no arquivo após a devolução
-            salvaremprestimos(*emprestimos); // Salva os empréstimos no arquivo após a remoção do empréstimo
+
+            free(atual);
+
+            salvarlivros(livros);
+            salvaremprestimos(*emprestimos);
+
             printf("\nLivro devolvido com sucesso.\n");
-            return; // Encerra a função após processar a devolução
+            return;
         }
-        anterior = atual;    // Atualiza o ponteiro do empréstimo anterior para o empréstimo atual
-        atual = atual->prox; // Move para o próximo empréstimo na lista
+
+        anterior = atual;
+        atual = atual->prox;
     }
-    printf("\nEmpréstimo não encontrado para o livro especificado.\n"); // Se o loop terminar sem encontrar o empréstimo, exibe uma mensagem indicando que o empréstimo não foi encontrado
+
+    printf("\nNenhum empréstimo encontrado para essa matrícula e livro.\n");
 }
 
 void listarEmprestimos(Emprestimo *emprestimos)
@@ -122,6 +231,23 @@ void listarEmprestimos(Emprestimo *emprestimos)
     } // Percorre a lista de empréstimos e exibe as informações de cada empréstimo até o final da lista (quando atual for NULL)
 }
 
+int livroPossuiEmprestimos(Emprestimo *emprestimos, const char *titulo)
+{
+    Emprestimo *atual = emprestimos;
+
+    while (atual != NULL)
+    {
+        if (strcmp(atual->titulolivro, titulo) == 0)
+        {
+            return 1;
+        }
+
+        atual = atual->prox;
+    }
+
+    return 0;
+}
+
 void salvaremprestimos(Emprestimo *emprestimos)
 {
     FILE *arquivo = fopen("emprestimos.txt", "w");
@@ -130,40 +256,44 @@ void salvaremprestimos(Emprestimo *emprestimos)
         printf("\nErro ao abrir o arquivo para salvar os empréstimos.\n");
         return;
     }
+
     Emprestimo *atual = emprestimos;
     while (atual != NULL)
     {
-        fprintf(arquivo, "%s;%d;%s;%s;%s\n", atual->nomealuno, atual->matricula, atual->titulolivro, atual->dataemprestimo, atual->dataentrega);
+        fprintf(arquivo, "[EMPRESTIMO]\n");
+        fprintf(arquivo, "Aluno: %s\n", atual->nomealuno);
+        fprintf(arquivo, "Matricula: %d\n", atual->matricula);
+        fprintf(arquivo, "Livro: %s\n", atual->titulolivro);
+        fprintf(arquivo, "DataEmprestimo: %s\n", atual->dataemprestimo);
+        fprintf(arquivo, "DataEntrega: %s\n", atual->dataentrega);
+        fprintf(arquivo, "\n");
         atual = atual->prox;
     }
+
     fclose(arquivo);
 }
 
 void carregarEmprestimos(Emprestimo **emprestimos)
 {
-    // Abre o arquivo para leitura
     FILE *arquivo = fopen("emprestimos.txt", "r");
-
-    // Se o arquivo não existir, inicia com lista vazia
     if (arquivo == NULL)
     {
         *emprestimos = NULL;
         return;
     }
 
-    // Garante que a lista comece vazia
     *emprestimos = NULL;
 
-    // Buffer para armazenar cada linha lida do arquivo
     char linha[200];
 
-    // Lê uma linha por vez até o final do arquivo
     while (fgets(linha, sizeof(linha), arquivo) != NULL)
     {
-        // Aloca memória para um novo nó da lista
-        Emprestimo *novoEmprestimo = malloc(sizeof(Emprestimo));
 
-        // Verifica se a alocação foi bem-sucedida
+        // Detecta o início de um novo registro
+        if (strncmp(linha, "[EMPRESTIMO]", 12) != 0)
+            continue;
+
+        Emprestimo *novoEmprestimo = malloc(sizeof(Emprestimo));
         if (novoEmprestimo == NULL)
         {
             printf("Erro ao alocar memoria.\n");
@@ -171,30 +301,34 @@ void carregarEmprestimos(Emprestimo **emprestimos)
             return;
         }
 
-        // Tenta extrair os 5 campos da linha
-        int camposLidos = sscanf(
-            linha,
-            "%49[^;];%d;%49[^;];%10[^;];%10s",
-            novoEmprestimo->nomealuno,
-            &novoEmprestimo->matricula,
-            novoEmprestimo->titulolivro,
-            novoEmprestimo->dataemprestimo,
-            novoEmprestimo->dataentrega);
+        int camposLidos = 0;
 
-        // Se não conseguiu ler todos os campos, descarta o nó
+        // Lê as próximas linhas do registro
+        while (camposLidos < 5 && fgets(linha, sizeof(linha), arquivo) != NULL)
+        {
+            if (sscanf(linha, "Aluno: %49[^\n]", novoEmprestimo->nomealuno) == 1)
+                camposLidos++;
+            else if (sscanf(linha, "Matricula: %d", &novoEmprestimo->matricula) == 1)
+                camposLidos++;
+            else if (sscanf(linha, "Livro: %49[^\n]", novoEmprestimo->titulolivro) == 1)
+                camposLidos++;
+            else if (sscanf(linha, "DataEmprestimo: %10[^\n]", novoEmprestimo->dataemprestimo) == 1)
+                camposLidos++;
+            else if (sscanf(linha, "DataEntrega: %10[^\n]", novoEmprestimo->dataentrega) == 1)
+                camposLidos++;
+        }
+
+        // Descarta o nó se algum campo falhou
         if (camposLidos != 5)
         {
             free(novoEmprestimo);
             continue;
         }
 
-        // O novo nó será inserido no início da lista
+        // Insere no início da lista
         novoEmprestimo->prox = *emprestimos;
-
-        // Atualiza o início da lista
         *emprestimos = novoEmprestimo;
     }
 
-    // Fecha o arquivo
     fclose(arquivo);
 }

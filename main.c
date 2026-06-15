@@ -2,26 +2,30 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <windows.h>
-#include "emprestimo.h"
+
 #include "livro.h"
+#include "emprestimo.h"
+#include "validacao.h"
 
 int main()
 {
     SetConsoleCP(CP_UTF8);
     SetConsoleOutputCP(CP_UTF8);
-    setlocale(LC_ALL, " ");
-    Livro *livros = NULL;           // Ponteiro para a lista de livros, inicialmente vazio
-    Emprestimo *emprestimos = NULL; // Ponteiro para a lista de empréstimos, inicialmente vazio
+    setlocale(LC_ALL, ".UTF8");
 
-    carregarLivros(&livros);           // Carrega os livros do arquivo para a lista
-    carregarEmprestimos(&emprestimos); // Carrega os empréstimos do arquivo para a lista
+    Livro *livros = NULL;
+    Emprestimo *emprestimos = NULL;
+
+    carregarLivros(&livros);
+    carregarEmprestimos(&emprestimos);
 
     int opcao;
 
     do
     {
-        system("cls"); // Limpa a tela para uma melhor visualização do menu
-        printf("\nMenu:\n");
+        system("cls");
+
+        printf("\n========== BIBLIOTECA ==========\n");
         printf("1. Cadastrar Livro\n");
         printf("2. Emprestar Livro\n");
         printf("3. Devolver Livro\n");
@@ -29,55 +33,98 @@ int main()
         printf("5. Buscar Livro\n");
         printf("6. Listar Empréstimos\n");
         printf("7. Excluir Livro\n");
+        printf("8. Editar Livro\n");
         printf("0. Sair\n");
-        printf("Escolha uma opção: ");
-        scanf("%d", &opcao);
+        printf("===============================\n");
+
+        opcao = lerInteiro("Escolha uma opção: ");
 
         switch (opcao)
         {
         case 1:
             cadastrarLivro(&livros);
             break;
+
         case 2:
             emprestarLivro(livros, &emprestimos);
             break;
+
         case 3:
             devolverLivro(livros, &emprestimos);
             break;
+
         case 4:
             listarLivros(livros);
             break;
+
         case 5:
         {
             char titulo[50];
-            printf("Digite o título do livro que deseja buscar: ");
-            scanf(" %[^\n]", titulo);
+
+            lerString(
+                "Digite o título do livro que deseja buscar: ",
+                titulo,
+                sizeof(titulo));
+
             buscarLivro(livros, titulo);
             break;
         }
+
         case 6:
             listarEmprestimos(emprestimos);
             break;
+
         case 7:
         {
             char titulo[50];
-            printf("Digite o título do livro que deseja excluir: ");
-            scanf(" %[^\n]", titulo);
-            excluirLivro(&livros, titulo);
+
+            lerString(
+                "Digite o título do livro que deseja excluir: ",
+                titulo,
+                sizeof(titulo));
+
+            excluirLivro(&livros, emprestimos, titulo);
             break;
         }
+
+        case 8:
+        {
+            editarLivro(&livros, emprestimos);
+            break;
+        }
+
         case 0:
-            printf("Saindo...\n");
+            printf("\nSaindo do sistema...\n");
             break;
+
         default:
-            printf("Opção inválida. Tente novamente.\n");
+            printf("\nOpção inválida.\n");
         }
+
         if (opcao != 0){
             printf("\nPressione Enter para continuar...");
-            getchar(); // Limpa o buffer do teclado
-            getchar(); // Aguarda o usuário pressionar Enter
+            int c;
+            while ((c = getchar()) != '\n' && c != EOF);
         }
+
     } while (opcao != 0);
+
+    Livro *livroAtual = livros;
+    while (livroAtual != NULL)
+    {
+        Livro *temp = livroAtual;
+        livroAtual = livroAtual->prox;
+        free(temp);
+    }
+
+    // Liberar lista de empréstimos
+    Emprestimo *empAtual = emprestimos;
+    while (empAtual != NULL)
+    {
+        Emprestimo *temp = empAtual;
+        empAtual = empAtual->prox;
+        free(temp);
+    }
 
     return 0;
 }

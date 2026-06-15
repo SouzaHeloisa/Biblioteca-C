@@ -3,6 +3,8 @@
 #include <stdio.h>   
 #include <stdlib.h> 
 
+typedef struct emprestimo Emprestimo; // Declaração antecipada da estrutura Emprestimo para evitar dependências circulares
+
 typedef struct livro
 {
     int codlivro;
@@ -13,11 +15,13 @@ typedef struct livro
     struct livro *prox;
 } Livro;
 
+
 void cadastrarLivro(Livro **livros);                          // Declaração da função para cadastrar um livro
 void listarLivros(Livro *livros);                             // Declaração da função para listar os livros disponíveis
 void buscarLivro(Livro *livros, char *titulo);                // Declaração da função para buscar um livro pelo título
-void excluirLivro(Livro **livros, char *titulo);              // Declaração da função para excluir um livro
+void excluirLivro(Livro **livros, Emprestimo *emprestimos, char *titulo); // Declaração da função para excluir um livro, verificando se ele possui empréstimos registrados
 void salvarlivros(Livro *livros);                             // Declaração da função para salvar os livros em um arquivo
 void carregarLivros(Livro **livros);                          // Declaração da função para carregar os livros de um arquivo
+void editarLivro(Livro **livros, Emprestimo *emprestimos); // Declaração da função para editar as informações de um livro, verificando se ele possui empréstimos registrados
 
 #endif /* LIVRO_H */ // Fim do include guard
